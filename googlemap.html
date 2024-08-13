@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDn2HBYTulvaRPgcEMoSbE_IxTsK0G3r48"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Location on Google Map</h1>
+<div id="map"></div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Latitude</th>
+        <th>Longitude</th>
+    </tr>
+    </thead>
+    <tbody id="coordinates-table-body">
+    <tr>
+        <td id="latitude">Loading...</td>
+        <td id="longitude">Loading...</td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    let map;
+    let marker;
+
+    function initMap() {
+
+        // Initialize the map with default coordinates
+        var options = {
+            zoom: 13,
+            center: { lat: 47.1299458, lng: 27.6067345}
+        }
+
+        var map = new google.maps.Map(document.getElementById('map'), options);
+
+        /*
+        var marker = new google.maps.Marker({
+            position: {lat:47.127061,lng:27.6067345},
+            map:map
+        });
+
+        var infoWindow = new google.maps.InfoWindow({
+            content: '<h1>Current location</h1>'
+        });
+
+        marker.addListener('click', function () {
+            infoWindow.open(map, marker);
+        });
+        */
+
+        addMarker({ lat: 47.127061, lng: 27.6067345 });
+        addMarker({ lat: 47.126061, lng: 27.6057345 });
+
+        function addMarker(coords) {
+            var marker = new google.maps.Marker({
+                position: coords,
+                map: map,
+
+            })
+        }
+
+        $.getJSON('templates/gps.json', function (data) {
+            // Extract latitude and longitude
+            var latitude = parseFloat(data.latitude);
+            var longitude = parseFloat(data.longitude);
+
+            // Create a LatLng object
+            var myLatlng = new google.maps.LatLng(latitude, longitude);
+
+            // Create a marker at the extracted coordinates
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                map: map,
+                title: "Location: " + latitude + ", " + longitude
+            });
+
+            // Optionally center the map on the marker
+            map.setCenter(myLatlng);
+            map.setZoom(10); // Adjust the zoom level as needed
+        });
+
+    }
+    /*
+    function fetchGPSData() {
+        fetch('gps-data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Fetched GPS Data:', data); // Log the fetched data
+                const latitude = parseFloat(data.latitude);
+                const longitude = parseFloat(data.longitude);
+
+                if (!isNaN(latitude) && !isNaN(longitude)) {
+
+                    addMarker({ lat: latitude, lng: longitude });
+                } else {
+                    console.error('Invalid latitude or longitude:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching GPS data:', error);
+            });
+    }
+
+    function addMarker(coords) {
+        var marker = new google.maps.Marker({
+            position: coords,
+            map: map,
+
+        })
+    }
+
+    */
+
+    /*
+    function updateMap(latitude, longitude) {
+        const newLatLng = new google.maps.LatLng(latitude, longitude);
+        marker.setPosition(newLatLng);
+        map.setCenter(newLatLng);
+
+        // Update the table with new coordinates
+        document.getElementById('latitude').textContent = latitude;
+        document.getElementById('longitude').textContent = longitude;
+    }
+    */
+
+    // Initialize the map when the page loads
+    window.onload = initMap;
+    
+</script>
+</body>
+</html>
